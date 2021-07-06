@@ -1,0 +1,46 @@
+#!/usr/bin/bash
+
+if [ "$1" == "" ];then
+
+	printf "\n./fvckbrainly [args] [content]\n
+		-s = search url
+		-d = dump answer
+		-a = get the url's and try dump the answer's
+
+	./fvckbrainly -s \"richard stallman e um deus ?\"
+	./fvckbrainly -d \"https://brainly.com.br/tarefa/28339231\"
+	./fvckbrainly -a \"ana tinha 5 bananas, comeu 7 com quantas ela ficou ... kk\"
+
+";exit 0
+fi
+
+
+if [ ! "$(/usr/bin/wget 2>/dev/null)" ];then
+	printf "\n\e[1;31mERROR\e[0m: WGET PERMISSION DENIED !!\n\n   /usr/bin/wget - %s\n\n" $(ls -l /usr/bin/wget|awk '{print $1}');exit 0
+elif [ ! "$(/usr/bin/lynx 2>/dev/null)" ];then
+	printf "\n\e[1;31mERROR\e[0m: LYNX PERMISSION DENIED !!\n\n   /usr/bin/lynx - %s\n\n" $(ls -l /usr/bin/lynx|awk '{print $1}');exit 0
+fi
+
+
+echo
+case "$1" in
+	-d|--dump|-D)		wget "$2" -q -O index; grep "<strong>" index; rm -f index ;;
+	-s|--search|-S)	lynx -cookies -accept_all_cookies -useragent="no-sniff" "https://www.google.com/search?q=site%3Abrainly.com.br+\"$2\"" -dump 2>/dev/null|awk -F"?q=" '{print $2}'|grep -v google|cut -d "&" -f1|grep -v site|sort|uniq -u ;;
+
+	-a|--all|-A)
+
+		lynx -cookies -accept_all_cookies -useragent="no-sniff" "https://www.google.com/search?q=site%3Abrainly.com.br+\"$2\"" -dump 2>/dev/null|awk -F"?q=" '{print $2}'|grep -v google|cut -d "&" -f1|grep -v site|sort|uniq -u > links.fvckbrainly	
+		printf "\n-----------------------------------------------\n\n"; cat links.fvckbrainly; printf "\n\n-----------------------------------------------\n"
+
+		for U in $(cat links.fvckbrainly);do
+
+			printf "\n+\t%s\t+\n\n" $U
+			wget "$U" -q -O index; grep "<strong>" index; rm -f index
+
+		done
+		rm -f links.fvckbrainly
+		;;
+
+	*) exit 1 ;;
+esac
+echo
