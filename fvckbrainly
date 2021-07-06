@@ -15,9 +15,9 @@ if [ "$1" == "" ];then
 fi
 
 
-if [ ! "$(/usr/bin/wget 2>/dev/null)" ];then
+if [ ! "$(/usr/bin/wget -h 2>/dev/null)" ];then
 	printf "\n\e[1;31mERROR\e[0m: WGET PERMISSION DENIED !!\n\n   /usr/bin/wget - %s\n\n" $(ls -l /usr/bin/wget|awk '{print $1}');exit 0
-elif [ ! "$(/usr/bin/lynx 2>/dev/null)" ];then
+elif [ ! "$(/usr/bin/lynx -h 2>/dev/null)" ];then
 	printf "\n\e[1;31mERROR\e[0m: LYNX PERMISSION DENIED !!\n\n   /usr/bin/lynx - %s\n\n" $(ls -l /usr/bin/lynx|awk '{print $1}');exit 0
 fi
 
